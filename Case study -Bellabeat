@@ -1,0 +1,109 @@
+BELLABEAT CASE STUDY
+Bella beat is  a high-tech company that manufactures health-focused smart products.  Bellabeat’s available consumer data would reveal more opportunities for growth.,they want the analytics team to focus on a Bellabeat product and analyze smart device usage data in order to gain insight into how people are already using their smart devices. Then, using this information, they would like high-level recommendations for how these trends can inform Bellabeat marketing strategy.
+
+PHASE 1
+Ask:
+1)Business Task- 
+To identify  What are some trends in smart device usage and how could these trends apply to Bellabeat customers.Identify trends to help influence Bellabeat marketing strategy.
+
+2)Stakeholders – 
+Urška Sršen: Bellabeat’s cofounder and Chief Creative Officer 
+Sando Mur: Mathematician and Bellabeat’s cofounder.
+
+PHASE 2 
+PREPARE-
+1. DATA SOURCE-
+•	The data used for this project is public data from FitBit Fitness Tracker Data. It's a dataset that contains thirty fitbit users fitness data that includes minute-level output for physical activity, heart rate, and sleep monitoring.
+
+2. Tables used for this analysis –
+Daily activity and sleep day Imported from public data set.
+
+3.GOAL-
+ To determine and identify patterns how more steps helps burn more calories and how it affects sleep cycle.
+Preparing Environment
+install.packages("tidyverse")
+library(tidyverse)
+
+install.packages("magrittr")
+library(magrittr)
+
+install.packages("ggplot2")
+library(ggplot2)
+
+install.packages("dplyr")
+library(dplyr)
+
+library(readr)
+dailyActivity_merged <- read_csv("dailyActivity_merged.csv")
+View(dailyActivity_merged)
+
+sleepDay_merged <- read_csv("sleepDay_merged.csv")
+View(sleepDay_merged)
+
+Changing Date Format of both Tables:
+dailyActivity_merged$ActivityDate<-as.Date(dailyActivity_merged$ActivityDate,"%m/%d/%y")
+sleepDay_merged$ActivityDate<-as.Date(sleepDay_merged$ActivityDate,"%m/%d/%y")
+
+Merging two tables to one
+daily_Activity <- dplyr::full_join(dailyActivity_merged,sleepDay_merged) %>%
+  arrange(Id)
+
+head(daily_Activity)
+view(daily_Activity)
+
+Checking for 0 values in table
+daily_Activity %>% 
+  count(daily_Activity$TotalSteps == 0)
+
+PHASE 3,4
+3:Process and Analyze
+Creating a summarized final table to analyze the trends how total sleep is affected by steps
+
+summaryof_dailyActivity <- dailyActivity_merged %>% 
+  group_by(Id) %>% 
+  summarize(sum_steps = sum(TotalSteps), avg_steps = mean(TotalSteps), total_entries = length(TotalSteps),avg_calories=mean(Calories))
+summaryof_dailyActivity $steps = case_when(
+  summaryof_dailyActivity$avg_steps >= 10000 ~ "Very Active",
+  summaryof_dailyActivity$avg_steps >= 5000 ~ "Moderate Active",
+  summaryof_dailyActivity$avg_steps >= 1000 ~ "Low Active",
+  summaryof_dailyActivity $avg_steps < 1000 ~ "Inactive")
+
+summaryof_sleep <- sleepDay_merged %>% 
+  group_by(Id) %>% 
+  summarize(AvgMinutesAsleep=mean(TotalMinutesAsleep))
+
+finaldata <- dplyr::full_join(summaryof_dailyActivity,summaryof_sleep) %>%
+  arrange(Id)
+view(finaldata)
+
+PHASE 5
+VIZUALIZATION
+ 
+ggplot(data = summaryof_dailyActivity) +
+  geom_point(mapping = aes(x=avg_steps, y=sum_steps, color = steps))+
+  facet_wrap(~steps)
+ 
+
+ggplot(data=dailyActivity_merged)+
+  geom_smooth(mapping = aes(x=TotalSteps,y=Calories))
+
+
+ 
+
+
+ggplot(data=finaldata)+
+  geom_point(mapping = aes(x=avg_steps,y=AvgMinutesAsleep,color=steps))+
+  labs(title="Average Steps compared to Average Calories")
+
+ 
+
+
+
+PHASE 6: Share
+
+1.Conclusions.:
+•	There are some interesting analysis I found in this data that I think would be interesting when better targeting the marketing to new customers:
+ There is a clear relation between more the steps,more the calories burnt. More calories burnt in turn helps get a good night sleep,which in turn can be beneficial for your health.We can send notifications to customers to encourage them get more steps daily and set new goal.We can also send useful health related blogs to new customers to encourage them to invest in our products.
+Providing offers for new products for achieving a goal for existing customers can also be help us achieving this goal.
+
+THANK YOU! 
